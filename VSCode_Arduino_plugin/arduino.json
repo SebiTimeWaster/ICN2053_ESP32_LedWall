@@ -1,0 +1,14 @@
+{
+    "sketch": "ICN2053_ESP32_LedWall.ino",
+    "port": "/dev/ttyUSB0",
+    "board": "esp32:esp32:nodemcu-32s",
+    "output": "../build",
+    "debugger": "jlink",
+    "browse": {
+        "path": [
+            "<FullPathToYourArduinoInstallation>/arduino-1.8.9/hardware/arduino/avr",
+            "${workspaceRoot}"
+        ]
+    },
+    "configuration": "FlashFreq=40,UploadSpeed=115200"
+}
