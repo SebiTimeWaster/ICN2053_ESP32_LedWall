@@ -7,10 +7,10 @@
 #define DISPLAY_WIDTH       64
 #define DISPLAY_HEIGHT      64
 #define DISPLAY_SCAN_LINES  32 // scan lines are usually half the display height
-#define EFFECT              1  // 1: Gray gradient (static)  2: Random gray static  3: Random color static  4: Animated Rainbow  5: Animated random gray static
+#define EFFECT              4  // 1: Gray gradient (static)  2: Random gray static  3: Random color static  4: Animated Rainbow  5: Animated random gray static
 
 // leave this like it is, the pins are carefully selected to not interfere with special purpose pins
-// also pins with the same function are grouped together so they can be set with one command to save cpu cycles
+// also pins with the same function are grouped together so they can be set with one command to save CPU cycles
 #define PIN_CLK 2 
 #define PIN_LE  27
 #define PIN_OE  5
@@ -107,7 +107,7 @@ void setup() {
     // this configuration was created by @ElectronicsInFocus https://www.youtube.com/watch?v=nhCGgTd7OHg
     // also the original C++ code this Arduino version is based on was created by him
     // it is unknown to me what this configuration does, there is no information about 
-    // it whatsoever on the internet (not that i could find)
+    // it whatsoever on the internet (not that I could find)
     // if someone has a document describing the configuration registers please send it to me!
     sendLatch(14); // Pre-active command
     sendLatch(12); // Enable all output channels
@@ -117,17 +117,17 @@ void setup() {
     sendLatch(14); // Pre-active command
     sendConfiguration(0xffff, 6); // Write config register 2 (6 latches)
     sendLatch(14); // Pre-active command
-    sendConfiguration(0b0100000011110011, 8); // Write config. register 3 (8 latches)
+    sendConfiguration(0b0100000011110011, 8); // Write config register 3 (8 latches)
     sendLatch(14); // Pre-active command
     sendConfiguration(0x0000, 10); // Write config register 4 (10 latches)
     sendLatch(14); // Pre-active command
     sendConfiguration(0x0000, 2); // Write debug register (2 latches)
 
-    // initialize the refresh and data "aquisition" tasks to run on separate cpu cores
+    // initialize the refresh and data "acquisition" tasks to run on separate CPU cores
     // this is an ESP-IDF feature to run tasks (endless loops) on different cores
     // callback, name, stack size, null, priority 3-0 (0 lowest), null, core (0 or 1)
-    xTaskCreatePinnedToCore(refreshTask, "refreshTask", 1024, NULL, 3, NULL, 1);
-    xTaskCreatePinnedToCore(dataTask, "dataTask", 1024, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(refreshTask, "refreshTask", 1024, NULL, 3, NULL, 0);
+    xTaskCreatePinnedToCore(dataTask, "dataTask", 1024, NULL, 1, NULL, 1);
 }
 
 void loop() {}
@@ -265,7 +265,7 @@ void sendConfiguration(unsigned int data, unsigned char latches) {
 	unsigned char num = displayNumberChips;
     unsigned int dataMask;
     unsigned long zero = 0x00000000;
-    unsigned long rgbrgbMask = 0x000FC000; // all 6 rgb pins high
+    unsigned long rgbrgbMask = 0x000FC000; // all 6 RGB pins high
 
     latches = 16 - latches;
 
@@ -299,7 +299,7 @@ void cacheWrite(unsigned char *buffer, unsigned int posX, unsigned int posY, uns
 
     // data is saved in a format where the refresh method just needs to send it out instead of formatting it first, which makes it 7 fps faster
     // the highest bit of each color is saved in a char and written into the buffer, then the second highest bit and so on
-    // since the rgb values of two different lines are sent at the same time, when y is bigger than the scan line area the data is written into differnt bits of the buffer data
+    // since the RGB values of two different lines are sent at the same time, when y is bigger than the scan line area the data is written into different bits of the buffer data
     for(unsigned char x = 0; x < 16; x++) {
         rgb = 0x00;
         inputMask = 0x8000 >> x;
@@ -328,7 +328,7 @@ void LedWallRefresh() {
 		for(unsigned int x = 0; x < 16; x++) { // 0-15 because 1 chip has 16 outputs
             bufferPos = y * displayBufferLineSize + x * 16;
 	        sendScanLine(y % 2 * DISPLAY_SCAN_LINES / 2 + x); // sends 0-N scan lines in every 2 (4 combined) data lines
-			sendPwmClock(138); // send 138 clock cycles for pwm generation inside the ICN2053 chips - this needs to be exactly 138 pules
+			sendPwmClock(138); // send 138 clock cycles for PWM generation inside the ICN2053 chips - this needs to be exactly 138 pulses
 
 			for(unsigned int sect = 0; sect < displayNumberChips; sect++) { // 0-N number of chips
                 pos = bufferPos + sect * 16 * 16;
