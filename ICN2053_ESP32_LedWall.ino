@@ -7,7 +7,7 @@
 #define DISPLAY_WIDTH       64
 #define DISPLAY_HEIGHT      64
 #define DISPLAY_SCAN_LINES  32 // scan lines are usually half the display height
-#define EFFECT              4  // 1: Gray gradient (static)  2: Random gray static  3: Random color static  4: Animated Rainbow  5: Animated random gray static
+#define EFFECT              1  // 1: Gray gradient (static)  2: Random gray static  3: Random color static  4: Animated Rainbow  5: Animated random gray static
 
 // leave this like it is, the pins are carefully selected to not interfere with special purpose pins
 // also pins with the same function are grouped together so they can be set with one command to save cpu cycles
@@ -326,7 +326,7 @@ void LedWallRefresh() {
     // the order and amount of clock cycles, latches, PWM clock and so on can not be changed.
 	for(unsigned int y = 0; y < DISPLAY_SCAN_LINES; y++) { // 0-N scan lines * 2 = pixel height
 		for(unsigned int x = 0; x < 16; x++) { // 0-15 because 1 chip has 16 outputs
-            bufferPos = (y * DISPLAY_WIDTH + x) * 16;
+            bufferPos = y * displayBufferLineSize + x * 16;
 	        sendScanLine(y % 2 * DISPLAY_SCAN_LINES / 2 + x); // sends 0-N scan lines in every 2 (4 combined) data lines
 			sendPwmClock(138); // send 138 clock cycles for pwm generation inside the ICN2053 chips - this needs to be exactly 138 pules
 
