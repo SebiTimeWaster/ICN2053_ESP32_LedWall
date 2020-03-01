@@ -57,8 +57,8 @@ void IRAM_ATTR sendClock() {
 
 void IRAM_ATTR sendPwmClock(unsigned char clocks) {
     while (clocks--) {
-    	digitalWriteFast(PIN_OE, 1);
-    	digitalWriteFast(PIN_OE, 0);
+        digitalWriteFast(PIN_OE, 1);
+        digitalWriteFast(PIN_OE, 0);
     }
 }
 
@@ -92,10 +92,10 @@ void setup() {
     screenBuffer[1] = (unsigned char*)malloc(displayBufferSize);
 
     // fill buffers with 0
-	for (unsigned int x = 0; x < displayBufferSize; x++) {
-		screenBuffer[0][x] = 0;
-		screenBuffer[1][x] = 0;
-	}
+    for (unsigned int x = 0; x < displayBufferSize; x++) {
+        screenBuffer[0][x] = 0;
+        screenBuffer[1][x] = 0;
+    }
 
     // setup pins
     for (unsigned char x = 0; x < 14; x++) {
@@ -262,7 +262,7 @@ void dataTask(void *pvParameters) {
  * normal methods
  */
 void sendConfiguration(unsigned int data, unsigned char latches) {
-	unsigned char num = displayNumberChips;
+    unsigned char num = displayNumberChips;
     unsigned int dataMask;
     unsigned long zero = 0x00000000;
     unsigned long rgbrgbMask = 0x000FC000; // all 6 RGB pins high
@@ -324,13 +324,13 @@ void LedWallRefresh() {
 
     // since the generation of the output signal in the ICN2053 chips is directly tied to the input clock signal when receiving pixel data,
     // the order and amount of clock cycles, latches, PWM clock and so on can not be changed.
-	for(unsigned int y = 0; y < DISPLAY_SCAN_LINES; y++) { // 0-N scan lines * 2 = pixel height
-		for(unsigned int x = 0; x < 16; x++) { // 0-15 because 1 chip has 16 outputs
+    for(unsigned int y = 0; y < DISPLAY_SCAN_LINES; y++) { // 0-N scan lines * 2 = pixel height
+        for(unsigned int x = 0; x < 16; x++) { // 0-15 because 1 chip has 16 outputs
             bufferPos = y * displayBufferLineSize + x * 16;
-	        sendScanLine(y % 2 * DISPLAY_SCAN_LINES / 2 + x); // sends 0-N scan lines in every 2 (4 combined) data lines
-			sendPwmClock(138); // send 138 clock cycles for PWM generation inside the ICN2053 chips - this needs to be exactly 138 pulses
+            sendScanLine(y % 2 * DISPLAY_SCAN_LINES / 2 + x); // sends 0-N scan lines in every 2 (4 combined) data lines
+            sendPwmClock(138); // send 138 clock cycles for PWM generation inside the ICN2053 chips - this needs to be exactly 138 pulses
 
-			for(unsigned int sect = 0; sect < displayNumberChips; sect++) { // 0-N number of chips
+            for(unsigned int sect = 0; sect < displayNumberChips; sect++) { // 0-N number of chips
                 pos = bufferPos + sect * 16 * 16;
 
                 for(unsigned char bit = 0; bit < 16; bit++) { // 0-16 bits of pixel data
@@ -340,7 +340,7 @@ void LedWallRefresh() {
                 }
 
                 digitalWriteFast(PIN_LE, 0);
-			}
-		}
-	}
+            }
+        }
+    }
 }
